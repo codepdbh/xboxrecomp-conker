@@ -41,7 +41,7 @@ extern "C" {
 #define XBOX_MAP_START          0x00000000
 
 /* Xbox physical memory */
-#define XBOX_TOTAL_RAM          (64 * 1024 * 1024)  /* 64 MB */
+#define XBOX_TOTAL_RAM          (128 * 1024 * 1024) /* Devkit-sized compatibility pool */
 #define XBOX_GPU_RESERVED       (4 * 1024 * 1024)   /* ~4 MB for GPU */
 
 /* NOTE: Section addresses (.text, .rdata, .data, etc.) are NOT hardcoded.

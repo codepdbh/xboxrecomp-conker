@@ -1,8 +1,19 @@
-/* Seeded functions that were not part of the original automatic split. */
+/* Seeded functions that were not part of the original automatic split.
+ * Keep this translation unit rebuilt when a continuation body changes. (5) */
 #define RECOMP_GENERATED_CODE
 #include "recomp_funcs.h"
 
 #include "../../../../recomp_single_399ff/recompiled.c"
+#include "../../../../recomp_single_38400/recompiled.c"
+#include "../../../../recomp_single_38404/recompiled.c"
+#include "../../../../recomp_single_385b2/recompiled.c"
+#include "../../../../recomp_single_385bc/recompiled.c"
+#include "../../../../recomp_single_37f34/recompiled.c"
+#include "../../../../recomp_single_39e67/recompiled.c"
+#include "../../../../recomp_single_39ee2/recompiled.c"
+#include "../../../../recomp_single_39f38/recompiled.c"
+#include "../../../../recomp_single_a01b/recompiled.c"
+#include "../../../../recomp_single_a01f/recompiled.c"
 #include "../../../../recomp_single_38f14/recompiled.c"
 #include "../../../../recomp_single_38f18/recompiled.c"
 #include "../../../../recomp_single_38f25/recompiled.c"
@@ -28,3 +39,8 @@
 #include "../../../../recomp_single_cfd7/recompiled.c"
 #include "../../../../recomp_single_d949/recompiled.c"
 #include "../../../../recomp_single_e603/recompiled.c"
+#include "../../../../recomp_single_609e6/recompiled.c"
+#include "../../../../recomp_single_609f1/recompiled.c"
+#include "../../../../recomp_single_3500bc/recompiled.c"
+#include "../../../../recomp_single_3500c4/recompiled.c"
+#include "../../../../recomp_single_3500e3/recompiled.c"

@@ -3747,7 +3747,9 @@ loc_004731CD: ;
     goto loc_00473346;
 
 loc_004731D7: ;
-    if (TEST_NZ(eax, eax)) goto loc_004731E2; /* jne: not equal / not zero */
+    /* %s arguments must point into mapped user memory.  Synthetic thunk
+     * addresses (0xFE...) are callable tokens, never readable strings. */
+    if (TEST_NZ(eax, eax) && eax < 0x04000000u) goto loc_004731E2;
 
 loc_004731DB: ;
     MEM32(ebp + -12) = 0x586954;
@@ -15089,14 +15091,10 @@ loc_00479B3E: ;
 loc_00479B46: ;
     PUSH32(esp, esi);
     PUSH32(esp, edi);
-    eax = MEM32(0x28);
-    if (CMP_EQ(MEM32(eax + 0x28), 0)) { sub_00479B6B(); return; } /* je: equal / zero */
+    if (CMP_EQ(MEM32(0x00760028), 0)) { sub_00479B6B(); return; } /* je: equal / zero */
 
 loc_00479B54: ;
-    eax = MEM32(0x75F014);
-    ecx = MEM32(4);
-    edi = MEM32(ecx + eax * 4);
-    edi = edi + 0xC;
+    edi = 0x0076020C;
     g_seh_ebp = ebp; sub_00479B70(); return; /* tail jmp 0x00479B70 */
 
 }
@@ -15288,14 +15286,10 @@ loc_00479C89: ;
 
 loc_00479C91: ;
     PUSH32(esp, esi);
-    eax = MEM32(0x28);
-    if (CMP_EQ(MEM32(eax + 0x28), 0)) { sub_00479CB5(); return; } /* je: equal / zero */
+    if (CMP_EQ(MEM32(0x00760028), 0)) { sub_00479CB5(); return; } /* je: equal / zero */
 
 loc_00479C9E: ;
-    eax = MEM32(0x75F014);
-    ecx = MEM32(4);
-    esi = MEM32(ecx + eax * 4);
-    esi = esi + 0xC;
+    esi = 0x0076020C;
     g_seh_ebp = ebp; sub_00479CBA(); return; /* tail jmp 0x00479CBA */
 
 }

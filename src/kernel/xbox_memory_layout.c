@@ -83,7 +83,7 @@ BOOL xbox_MemoryLayoutInit(const void *xbe_data, size_t xbe_size)
      * from, the XBE sections, and the simulated stack.
      */
     /* Map the full 64MB Xbox address space (covers all sections + stack + heap) */
-    g_memory_size = XBOX_TOTAL_RAM;
+    g_memory_size = (size_t)XBOX_TOTAL_RAM;
 
     /*
      * Create a file mapping backed by the page file.
@@ -341,7 +341,7 @@ BOOL xbox_MemoryLayoutInit(const void *xbe_data, size_t xbe_size)
      * we populate the TIB fields that game code accesses:
      *
      *   fs:[0x00] = SEH exception list (-1 = end of chain)
-     *   fs:[0x04] = stack base (top of stack)
+     *   fs:[0x04] = TLS slot vector used by this XDK CRT
      *   fs:[0x08] = stack limit (bottom of stack)
      *   fs:[0x18] = self pointer (TIB address)
      *   fs:[0x20] = KPCR Prcb pointer (→ fake structure)
@@ -355,7 +355,6 @@ BOOL xbox_MemoryLayoutInit(const void *xbe_data, size_t xbe_size)
 
         /* Fake TIB at address 0x0 */
         MEM32_INIT(0x00, 0xFFFFFFFF);       /* SEH: end of chain */
-        MEM32_INIT(0x04, XBOX_STACK_TOP);   /* Stack base (high address) */
         MEM32_INIT(0x08, XBOX_STACK_BASE);  /* Stack limit (low address) */
         MEM32_INIT(0x18, 0x00000000);       /* Self pointer (TIB at VA 0) */
 
@@ -376,17 +375,33 @@ BOOL xbox_MemoryLayoutInit(const void *xbe_data, size_t xbe_size)
          * to its data area. We allocate a fake structure at 0x00760000
          * (in the BSS area) and a data buffer at 0x00700000.
          */
-        #define FAKE_TLS_VA     0x00760000  /* Fake TLS structure (in BSS) */
-        #define FAKE_RWDATA_VA  0x00700000  /* RW engine data area (in BSS) */
+        #define FAKE_TLS_VA        0x00760000  /* Xbox TLS structure (in BSS) */
+        #define FAKE_TLS_VECTOR_VA 0x00760100  /* XDK CRT TLS slot vector */
+        #define FAKE_CRT_TLS_VA    0x00760200  /* Per-thread CRT state */
+        #define FAKE_RWDATA_VA     0x00700000  /* RW engine data area (in BSS) */
+
+        /*
+         * Conker's XDK CRT indexes fs:[4] with the TLS index stored at
+         * 0x0075F014, then accesses fields in the resulting per-thread
+         * block.  The executable's initial TLS index is zero, so provide
+         * slot zero and a zero-initialized CRT state block.
+         */
+        MEM32_INIT(0x04, FAKE_TLS_VECTOR_VA);
+        memset(XBOX_VA(FAKE_TLS_VECTOR_VA), 0, 0x100);
+        memset(XBOX_VA(FAKE_CRT_TLS_VA), 0, 0x100);
+        MEM32_INIT(FAKE_TLS_VECTOR_VA, FAKE_CRT_TLS_VA);
 
         MEM32_INIT(0x28, FAKE_TLS_VA);
         /* TLS[0x28] = pointer to RW data area */
         MEM32_INIT(FAKE_TLS_VA + 0x28, FAKE_RWDATA_VA);
 
-        fprintf(stderr, "  TIB: fake TIB at VA 0x0, TLS at 0x%08X, RW data at 0x%08X\n",
-                FAKE_TLS_VA, FAKE_RWDATA_VA);
+        fprintf(stderr,
+                "  TIB: fake TIB at VA 0x0, TLS at 0x%08X, CRT TLS at 0x%08X, RW data at 0x%08X\n",
+                FAKE_TLS_VA, FAKE_CRT_TLS_VA, FAKE_RWDATA_VA);
 
         #undef FAKE_TLS_VA
+        #undef FAKE_TLS_VECTOR_VA
+        #undef FAKE_CRT_TLS_VA
         #undef FAKE_RWDATA_VA
         #undef FAKE_KPCR_VA
         #undef MEM32_INIT

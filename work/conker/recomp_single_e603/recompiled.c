@@ -609,7 +609,10 @@ loc_0053EE3B: ;
 
 loc_0053EE4B: ;
     eax = MEM32(eax + 0x20);
-    if (TEST_Z(eax, eax)) goto loc_0053EE8F; /* je: equal / zero */
+    /* This per-thread D3D cache is optional.  The static runtime does not
+     * currently model the Xbox KPCR chain for every synthetic thread; a
+     * stale chain can therefore yield a non-null non-user pointer. */
+    if (TEST_Z(eax, eax) || eax >= 0x04000000u) goto loc_0053EE8F;
 
 loc_0053EE52: ;
     ecx = ebp + 0x1DE4;

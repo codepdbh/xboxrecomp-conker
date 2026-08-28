@@ -523,6 +523,37 @@ static void bridge_RtlLeaveCriticalSection(void)
     g_eax = 0;
 }
 
+/* Xbox strings contain a 32-bit guest pointer, so they cannot be filled by
+ * casting the guest buffer to the native Win64 XBOX_ANSI_STRING type. */
+static void bridge_RtlInitAnsiString(void)
+{
+    uint32_t destination_va = STACK_ARG(0);
+    uint32_t source_va = STACK_ARG(1);
+    uint16_t length = 0;
+
+    if (!destination_va) {
+        g_eax = 0;
+        return;
+    }
+
+    if (source_va) {
+        const char *source = (const char *)XBOX_TO_NATIVE(source_va);
+        size_t native_length = strnlen(source, 0xFFFFu);
+        length = (uint16_t)(native_length > 0xFFFEu ? 0xFFFEu : native_length);
+    }
+
+    BRIDGE_MEM16(destination_va + 0) = length;
+    BRIDGE_MEM16(destination_va + 2) = source_va ? (uint16_t)(length + 1) : 0;
+    BRIDGE_MEM32(destination_va + 4) = source_va;
+    g_eax = 0;
+}
+
+/* The file-system cache is represented by host file I/O in this runtime. */
+static void bridge_FscSetCacheSize(void)
+{
+    g_eax = 0; /* STATUS_SUCCESS */
+}
+
 /* ── KeQueryPerformanceCounter / Frequency (ordinals 126, 127) ─ */
 static void bridge_KeQueryPerformanceCounter(void)
 {
@@ -1075,6 +1106,8 @@ static void bridge_NtQueryFullAttributesFile(void)
 
     bridge_build_oa(obj_attrs, &oa, &name);
     if (!name.Buffer) { g_eax = STATUS_OBJECT_PATH_NOT_FOUND; return; }
+    fprintf(stderr, "  [KERNEL] NtQueryFullAttributesFile: path='%.*s'\n",
+            (int)name.Length, name.Buffer);
     g_eax = (uint32_t)xbox_NtQueryFullAttributesFile(&oa,
                 (PXBOX_FILE_NETWORK_OPEN_INFORMATION)XBOX_TO_NATIVE(info_va));
 }
@@ -1335,6 +1368,7 @@ static int stdcall_args_for_ordinal(ULONG ordinal)
     case  16: return  8;  /* ExAllocatePoolWithTag(2) */
     /* case  17: DATA export - ExEventObjectType */
     case  24: return  4;  /* ExQueryPoolBlockSize(1) */
+    case  37: return  4;  /* FscSetCacheSize(1) */
 
     /* ── HAL ── */
     case  40: return  4;  /* HalClearSoftwareInterrupt(1) */
@@ -1567,6 +1601,9 @@ static bridge_func_t bridge_for_ordinal(ULONG ordinal)
     /* Hardware */
     case  47: return bridge_HalReadSMCTrayState;
 
+    /* File-system cache */
+    case  37: return bridge_FscSetCacheSize;
+
     /* Display */
     case   3: return bridge_AvSetDisplayMode;
 
@@ -1581,6 +1618,7 @@ static bridge_func_t bridge_for_ordinal(ULONG ordinal)
     case 178: return bridge_MmPersistContiguousMemory;
 
     /* RTL */
+    case 289: return bridge_RtlInitAnsiString;
     case 301: return bridge_RtlNtStatusToDosError;
     case 302: return bridge_RtlRaiseException;
 

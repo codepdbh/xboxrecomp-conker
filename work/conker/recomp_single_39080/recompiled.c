@@ -15,17 +15,20 @@ loc_00539080: ;
     ecx = MEM32(esp + 0x20);
     MEM32(ebp) = eax;
     PUSH32(esp, 0); sub_0053F9B0(); /* call 0x0053F9B0 */
+    conker_trace_point(0x53D7E281);
 
 loc_00539090: ;
     MEM32(ebp + 0x1A0C) = eax;
     PUSH32(esp, 0x546078);
     eax = ebp;
     PUSH32(esp, 0); sub_005381C0(); /* call 0x005381C0 */
+    conker_trace_point(0x53D7E282);
 
 loc_005390A2: ;
     edx = MEM32(0x549C74);
     PUSH32(esp, edx);
     PUSH32(esp, 0); sub_00537440(); /* call 0x00537440 */
+    conker_trace_point(0x53D7E283);
 
 loc_005390AE: ;
     conker_trace_point(0x53D7E2AE);

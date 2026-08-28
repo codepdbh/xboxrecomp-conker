@@ -51,6 +51,16 @@
   { "start": "0x0053CFCC", "reason": "D3D render-state setup alternate dimension calculation" },
   { "start": "0x0053CFD7", "reason": "D3D render-state command emission and epilogue" },
   { "start": "0x005399FF", "reason": "D3D texture-stage binding continuation and epilogue" },
+  { "start": "0x00538400", "reason": "D3D viewport setup floating-point branch continuation" },
+  { "start": "0x00538404", "reason": "D3D viewport command emission and shared epilogue" },
+  { "start": "0x005385B2", "reason": "D3D viewport matrix alternate calculation continuation" },
+  { "start": "0x005385BC", "reason": "D3D viewport matrix construction and epilogue" },
+  { "start": "0x00537F34", "reason": "D3D viewport command alternate path and epilogue" },
+  { "start": "0x00539E67", "reason": "D3D viewport rectangle nonzero-count continuation" },
+  { "start": "0x00539EE2", "reason": "D3D viewport rectangle command emission continuation" },
+  { "start": "0x00539F38", "reason": "D3D viewport rectangle alternate command path" },
+  { "start": "0x0053A01B", "reason": "D3D viewport rectangle shared state-copy continuation" },
+  { "start": "0x0053A01F", "reason": "D3D viewport rectangle shared epilogue" },
   { "start": "0x00538F14", "reason": "D3D surface-state setup zero-texture continuation" },
   { "start": "0x00538F18", "reason": "D3D surface-state command emission and shared epilogue" },
   { "start": "0x00538F25", "reason": "D3D surface-state command emission loop body" },
@@ -62,5 +72,10 @@
   { "start": "0x0053904C", "reason": "D3D surface-state second boolean false continuation" },
   { "start": "0x0053904E", "reason": "D3D surface-state final command setup continuation" },
   { "start": "0x00539080", "reason": "D3D surface-state shared epilogue" },
-  { "start": "0x004BD453", "reason": "CRT initializer referenced by the .CRT callback table" }
+  { "start": "0x004BD453", "reason": "CRT initializer referenced by the .CRT callback table" },
+  { "start": "0x000609E6", "reason": "Conker content metadata stat success continuation" },
+  { "start": "0x000609F1", "reason": "Conker content metadata initialization continuation" },
+  { "start": "0x003500BC", "reason": "Conker container nonempty continuation" },
+  { "start": "0x003500C4", "reason": "Conker container append continuation" },
+  { "start": "0x003500E3", "reason": "Conker container growth continuation" }
 ]

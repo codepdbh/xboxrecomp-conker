@@ -17155,6 +17155,13 @@ loc_002AA658: ;
 void sub_002AA660(void)
 {
     uint32_t ebp;
+    uint32_t append_root;
+    uint32_t append_previous;
+    uint32_t append_guard = 0;
+    uint32_t formatted_start;
+    uint32_t formatted_length;
+    uint32_t allocated_string;
+    uint32_t copy_index;
     int _flags = 0; /* fallback flag var */
     ebp = g_seh_ebp; /* fpo_leaf: inherit caller's frame */
 
@@ -17235,23 +17242,30 @@ loc_002AA70C: ;
     if (CMP_EQ(esi, ebx)) goto loc_002AA761; /* je: equal / zero */
 
 loc_002AA715: ;
-    eax = esp + 0x10;
+    formatted_start = esp + 0x10;
+    formatted_length = 0;
+    eax = formatted_start;
     MEM32(esi + 0xC) = ebx;
     MEM32(esi + 8) = ebx;
     MEM8(esi + 0x10) = LO8(ebx);
     edx = eax + 1;
 
 loc_002AA725: ;
-    SET_LO8(ecx, MEM8(eax));
-    eax++;
-    if (CMP_NE(LO8(ecx), LO8(ebx))) goto loc_002AA725; /* jne: not equal / not zero */
+    if (formatted_length >= 0xFF || MEM8(formatted_start + formatted_length) == 0) {
+        MEM8(formatted_start + formatted_length) = 0;
+        SET_LO8(ecx, 0);
+        eax = formatted_start + formatted_length + 1;
+        goto loc_002AA72C;
+    }
+    formatted_length++;
+    eax = formatted_start + formatted_length;
+    goto loc_002AA725;
 
 loc_002AA72C: ;
     PUSH32(esp, 0xFFFFFFFFu);
-    eax = eax - edx;
     PUSH32(esp, 0xC6);
-    eax++;
     PUSH32(esp, 0x6069F4);
+    eax = formatted_length + 1;
     PUSH32(esp, eax);
     PUSH32(esp, 0); sub_002AF0E0(); /* call 0x002AF0E0 */
 
@@ -17260,16 +17274,18 @@ loc_002AA741: ;
     if (CMP_EQ(eax, ebx)) goto loc_002AA75C; /* je: equal / zero */
 
 loc_002AA748: ;
-    ecx = esp + 0x10;
-    edi = eax;
-    edx = ecx;
-    edi = edi - edx;
+    allocated_string = eax;
+    for (copy_index = 0; copy_index <= formatted_length; ++copy_index) {
+        MEM8(allocated_string + copy_index) = MEM8(formatted_start + copy_index);
+    }
+    ecx = formatted_start + formatted_length + 1;
+    edi = allocated_string - formatted_start;
+    SET_LO8(edx, 0);
+    eax = allocated_string;
+    goto loc_002AA75C;
 
 loc_002AA752: ;
-    SET_LO8(edx, MEM8(ecx));
-    MEM8(edi + ecx) = LO8(edx);
-    ecx++;
-    if (CMP_NE(LO8(edx), LO8(ebx))) goto loc_002AA752; /* jne: not equal / not zero */
+    goto loc_002AA75C;
 
 loc_002AA75C: ;
     MEM32(esi + 0x14) = eax;
@@ -17287,9 +17303,17 @@ loc_002AA763: ;
 
 loc_002AA76F: ;
     /* nop */
+    append_root = eax;
+    append_previous = eax;
 
 loc_002AA770: ;
+    append_previous = eax;
     eax = MEM32(ecx);
+    if (eax == append_root || ++append_guard > 4096) {
+        /* Repair a corrupt circular list at its last valid node. */
+        eax = append_previous;
+        goto loc_002AA77C;
+    }
     edx = MEM32(eax + 4);
     (void)0; /* cmp edx, ebx - flags set for next jcc */
     ecx = eax + 4;

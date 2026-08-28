@@ -10,8 +10,15 @@ parte del repositorio y nunca se modifican.
 - Carga las 27 secciones del XBE y alcanza la rutina principal del juego.
 - Inicializa el dispositivo D3D/NV2A y procesa el rollover del push-buffer.
 - Conserva correctamente la pila en los caminos recuperados de D3D.
-- Todavía no es jugable: el bring-up continúa dentro de la inicialización
-  gráfica y quedan exports del kernel y continuaciones por implementar.
+- Implementa bridges del kernel y TLS/TIB compatible con las rutinas CRT que
+  usa Conker.
+- Recupera continuaciones faltantes de D3D, metadatos y contenedores, y evita
+  ciclos y copias sin límite durante la carga de recursos.
+- Usa un pool de compatibilidad de 128 MiB para completar las reservas del
+  bring-up, incluida una reserva contigua adicional de 10 MiB.
+- Todavía no es jugable: llega al allocator de recursos, pero no crea ventana.
+  El bloqueo reproducible actual es memoria interna sin inicializar marcada
+  con `0xEEEEEEEE`.
 
 ## Preparar el juego
 
@@ -46,3 +53,9 @@ Después ejecuta:
 `seed_functions.json` documenta los puntos de entrada recuperados. Los
 directorios `recomp_single_*` contienen los fragmentos recompilados que se
 integran desde `project/src/recomp/gen/recomp_seeded_continuations.c`.
+
+## Diagnóstico
+
+La última ejecución y compilación quedan en `last_run.log` y
+`last_build.log`; ambos se ignoran en Git. El XBE, la ISO, los datos extraídos
+y el ejecutable compilado tampoco se publican.

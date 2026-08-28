@@ -27477,27 +27477,40 @@ loc_0005FC39: ;
 void sub_0005FC90(void)
 {
     uint32_t ebp;
+    uint32_t owner;
+    uint32_t cursor;
+    uint32_t item;
+    uint32_t end;
     int _flags = 0; /* fallback flag var */
     ebp = g_seh_ebp; /* fpo_leaf: inherit caller's frame */
 
 loc_0005FC90: ;
-    eax = MEM32(ebx + 4);
-    ecx = MEM32(eax + 8);
+    if (ebx == 0 || ebx >= 0x04000000) {
+        eax = 0;
+        esp += 12; return;
+    }
+    owner = ebx;
+    eax = MEM32(owner + 4);
+    end = MEM32(eax + 8);
+    ecx = end;
     PUSH32(esp, ebp);
     ebp = MEM32(esp + 0xC);
     PUSH32(esp, esi);
-    esi = MEM32(eax + 4);
+    cursor = MEM32(eax + 4);
+    esi = cursor;
     (void)0; /* cmp esi, ecx - flags set for next jcc */
     PUSH32(esp, edi);
     if (CMP_AE(esi, ecx)) goto loc_0005FCCC; /* jae: above or equal (unsigned >=) */
 
 loc_0005FCA4: ;
-    edi = MEM32(esi);
+    item = MEM32(cursor);
+    edi = item;
+    if (item == 0 || item >= 0x04000000) goto loc_0005FCBF;
     eax = MEM32(esp + 0x10);
-    if (CMP_NE(MEM32(edi), eax)) goto loc_0005FCBF; /* jne: not equal / not zero */
+    if (CMP_NE(MEM32(item), eax)) goto loc_0005FCBF; /* jne: not equal / not zero */
 
 loc_0005FCAE: ;
-    eax = MEM32(edi + 4);
+    eax = MEM32(item + 4);
     PUSH32(esp, ebp);
     PUSH32(esp, eax);
     PUSH32(esp, 0); sub_00470C66(); /* call 0x00470C66 */
@@ -27507,10 +27520,11 @@ loc_0005FCB8: ;
     if (TEST_Z(eax, eax)) { sub_0005FCD4(); return; } /* je: equal / zero */
 
 loc_0005FCBF: ;
-    ecx = MEM32(ebx + 4);
+    ecx = MEM32(owner + 4);
     eax = MEM32(ecx + 8);
-    esi = esi + 4;
-    if (CMP_B(esi, eax)) goto loc_0005FCA4; /* jb: below (unsigned <) */
+    cursor = cursor + 4;
+    esi = cursor;
+    if (CMP_B(cursor, eax)) goto loc_0005FCA4; /* jb: below (unsigned <) */
 
 loc_0005FCCC: ;
     POP32(esp, edi);
@@ -27966,9 +27980,11 @@ loc_00060140: ;
     ecx = MEM32(ebp + ebx * 4);
     edx = MEM32(ecx + 4);
     if (TEST_Z(edx, edx)) goto loc_000601A0; /* je: equal / zero */
+    if (edx >= 0x04000000) goto loc_000601A0;
 
 loc_0006014B: ;
     eax = MEM32(ecx + 8);
+    if (eax <= edx || eax > 0x04000000 || eax - edx > 0x00100000) goto loc_000601A0;
     eax = eax - edx;
     eax = (uint32_t)((int32_t)eax >> 2);
     if (TEST_Z(eax, eax)) goto loc_000601A0; /* je: equal / zero */
@@ -27986,9 +28002,11 @@ loc_00060168: ;
     edi = MEM32(ebp + ebx * 4);
     edx = MEM32(edi + 4);
     if (TEST_Z(edx, edx)) goto loc_000601A0; /* je: equal / zero */
+    if (edx >= 0x04000000) goto loc_000601A0;
 
 loc_00060173: ;
     eax = MEM32(edi + 8);
+    if (eax <= edx || eax > 0x04000000 || eax - edx > 0x00100000) goto loc_000601A0;
     ecx = eax;
     ecx = ecx - edx;
     ecx = (uint32_t)((int32_t)ecx >> 2);
@@ -28092,6 +28110,7 @@ loc_000602E0: ;
 
 loc_000602E9: ;
     edx = MEM32(edi);
+    if (edx == 0 || edx >= 0x04000000) goto loc_000602F7;
     SET_LO8(ecx, MEM8(edx + 8));
     if (TEST_Z(LO8(ecx), LO8(ecx))) goto loc_00060300; /* je: equal / zero */
 

@@ -12286,6 +12286,11 @@ loc_003E67C7: ;
     eax = (uint32_t)((int32_t)eax * (int32_t)edx);
     PUSH32(esp, esi);
     esi = MEM32(ecx + 0xC);
+    if (esi == 0 || esi >= 0x08000000 || eax >= 0x08000000 - esi) {
+        eax = 0;
+        POP32(esp, esi);
+        esp += 4; return;
+    }
     edx = MEM32(eax + esi);
     eax = eax + esi;
     esi = MEM32(ecx + 0x18);

@@ -1489,11 +1489,7 @@ loc_0042F096: ;
 
 loc_0042F09A: ;
     PUSH32(esp, edi);
-    eax = MEM32(0x28);
-    edi = MEM32(4);
-    edx = MEM32(0x75F014);
-    edx = MEM32(edi + edx * 4);
-    edx = edx - MEM32(eax + 0x28);
+    edx = 0x00760200 - MEM32(0x00760028);
     MEM8(ecx) = 1;
     edx = edx + 8;
     MEM32(ecx + 4) = edx;
@@ -1506,12 +1502,14 @@ loc_0042F0C6: ;
     PUSH32(esp, 0); sub_0043065D(); /* call 0x0043065D */
 
 loc_0042F0CB: ;
+    conker_trace_point(0x53D7F0CB);
     PUSH32(esp, 0);
     PUSH32(esp, 0);
     PUSH32(esp, 0);
     PUSH32(esp, 0); sub_002A3670(); /* call 0x002A3670 */
 
 loc_0042F0D6: ;
+    conker_trace_point(0x53D7F0D6);
     esp = esp + 0xC;
     PUSH32(esp, 0);
     PUSH32(esp, 1);
@@ -1582,6 +1580,7 @@ loc_0042F148: ;
     PUSH32(esp, 0); sub_0042F6BC(); /* call 0x0042F6BC */
 
 loc_0042F152: ;
+    conker_trace_point(0x53D7F152);
     PUSH32(esp, edi);
     PUSH32(esp, 0); sub_0042C509(); /* call 0x0042C509 */
 

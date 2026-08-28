@@ -12477,8 +12477,16 @@ loc_005383CB: ;
     _fpu_cmp = (fp_top() < fp_st1()) ? -1 : (fp_top() > fp_st1()) ? 1 : 0; /* fcomp st(1) */
     MEM32(esi + 0x954) = edi;
     MEM32(esi + 0x958) = ecx;
-    /* fnstsw ax - store FPU status word */
-    if (1 /* jp after test - parity */) { sub_00538400(); return; } /* jp: parity */
+    /* test ah,5 / jp: branch for greater, equal, or unordered.  Keep the
+     * emulated FPU value in this translation unit so the split continuation
+     * does not start with a fresh synthetic FPU stack. */
+    if (_fpu_cmp != -1) {
+        MEMF(esp + 0x10) = (float)fp_top();
+        fp_popp();
+        g_seh_ebp = ebp;
+        sub_00538404();
+        return;
+    }
 
 loc_005383F4: ;
     ecx = MEM32(esp + 0x10);
@@ -12553,7 +12561,11 @@ loc_0053852C: ;
     fp_push(MEMF(edx + 0x948)); /* fld float */
     fp_st1() *= fp_top(); fp_pop(); /* fmul */
     MEMF(esp + 0x1C) = (float)fp_top(); fp_popp(); /* fstp */
-    if (CMP_NE(eax, 2)) { sub_005385B2(); return; } /* jne: not equal / not zero */
+    if (CMP_NE(eax, 2)) {
+        g_seh_ebp = ebp;
+        sub_005385B2();
+        return;
+    } /* jne: not equal / not zero */
 
 loc_00538572: ;
     fp_push(MEMF(edx + 0x944)); /* fld float */
@@ -13867,15 +13879,18 @@ loc_005398A7: ;
     POP32(esp, ebp);
 
 loc_005398F2: ;
+    conker_trace_point(0x53D7F001);
     PUSH32(esp, 0);
     PUSH32(esp, 0);
     PUSH32(esp, 0);
     PUSH32(esp, 0); sub_00539D70(); /* call 0x00539D70 */
 
 loc_005398FD: ;
+    conker_trace_point(0x53D7F002);
     PUSH32(esp, 0); sub_005384E0(); /* call 0x005384E0 */
 
 loc_00539902: ;
+    conker_trace_point(0x53D7F003);
     eax = MEM32(esi);
     if (CMP_B(eax, MEM32(esi + 4))) goto loc_00539918; /* jb: below (unsigned <) */
 
@@ -13890,6 +13905,7 @@ loc_00539918: ;
     PUSH32(esp, 0); sub_00537E30(); /* call 0x00537E30 */
 
 loc_0053991D: ;
+    conker_trace_point(0x53D7F004);
     MEM32(esi) = eax;
     POP32(esp, esi);
     esp = esp + 0xC;

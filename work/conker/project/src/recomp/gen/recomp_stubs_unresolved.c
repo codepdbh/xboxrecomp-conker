@@ -558,8 +558,6 @@ void sub_00060626(void) { /* 0x00060626: not detected */ }
 void sub_00060743(void) { /* 0x00060743: not detected */ }
 void sub_0006084B(void) { /* 0x0006084B: not detected */ }
 void sub_0006091A(void) { /* 0x0006091A: not detected */ }
-void sub_000609E6(void) { /* 0x000609E6: not detected */ }
-void sub_000609F1(void) { /* 0x000609F1: not detected */ }
 void sub_00060B26(void) { /* 0x00060B26: not detected */ }
 void sub_00060CB1(void) { /* 0x00060CB1: not detected */ }
 void sub_00060CDE(void) { /* 0x00060CDE: not detected */ }
@@ -4867,8 +4865,6 @@ void sub_0034FC7E(void) { /* 0x0034FC7E: not detected */ }
 void sub_0034FCC1(void) { /* 0x0034FCC1: not detected */ }
 void sub_0034FD71(void) { /* 0x0034FD71: not detected */ }
 void sub_0034FECC(void) { /* 0x0034FECC: not detected */ }
-void sub_003500BC(void) { /* 0x003500BC: not detected */ }
-void sub_003500C4(void) { /* 0x003500C4: not detected */ }
 void sub_00350141(void) { /* 0x00350141: not detected */ }
 void sub_0035028B(void) { /* 0x0035028B: not detected */ }
 void sub_003503D6(void) { /* 0x003503D6: not detected */ }
@@ -8903,11 +8899,6 @@ void sub_0053775A(void) { /* 0x0053775A: not detected */ }
 void sub_0053781D(void) { /* 0x0053781D: not detected */ }
 void sub_005379AC(void) { /* 0x005379AC: not detected */ }
 void sub_00537BFF(void) { /* 0x00537BFF: not detected */ }
-void sub_00537F34(void) { /* 0x00537F34: not detected */ }
-void sub_00538400(void) { /* 0x00538400: not detected */ }
-void sub_00538404(void) { /* 0x00538404: not detected */ }
-void sub_005385B2(void) { /* 0x005385B2: not detected */ }
-void sub_005385BC(void) { /* 0x005385BC: not detected */ }
 void sub_0053863B(void) { /* 0x0053863B: not detected */ }
 void sub_00538712(void) { /* 0x00538712: not detected */ }
 void sub_00538BBB(void) { /* 0x00538BBB: not detected */ }
@@ -8930,8 +8921,6 @@ void sub_00539BD9(void) { /* 0x00539BD9: not detected */ }
 void sub_00539C13(void) { /* 0x00539C13: not detected */ }
 void sub_00539C93(void) { /* 0x00539C93: not detected */ }
 void sub_00539D28(void) { /* 0x00539D28: not detected */ }
-void sub_00539E67(void) { /* 0x00539E67: not detected */ }
-void sub_00539EE2(void) { /* 0x00539EE2: not detected */ }
 void sub_0053A0A1(void) { /* 0x0053A0A1: not detected */ }
 void sub_0053A117(void) { /* 0x0053A117: not detected */ }
 void sub_0053A361(void) { /* 0x0053A361: not detected */ }

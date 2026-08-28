@@ -17165,6 +17165,10 @@ void sub_003500B0(void)
 
 loc_003500B0: ;
     PUSH32(esp, esi);
+    if (eax == 0 || eax >= 0x04000000) {
+        POP32(esp, esi);
+        esp += 4; return;
+    }
     esi = MEM32(eax + 4);
     if (TEST_NZ(esi, esi)) { sub_003500BC(); return; } /* jne: not equal / not zero */
 

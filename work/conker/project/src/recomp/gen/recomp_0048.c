@@ -4315,6 +4315,7 @@ loc_00425CE9: ;
  */
 void sub_00425CF0(void)
 {
+    uint32_t pool_slot;
     int _flags = 0; /* fallback flag var */
 
 loc_00425CF0: ;
@@ -4323,15 +4324,15 @@ loc_00425CF0: ;
 
 loc_00425CFD: ;
     PUSH32(esp, esi);
-    esi = 0x84C168;
+    pool_slot = 0x84C168;
 
 loc_00425D03: ;
     eax = MEM32(0x84BE58);
     if (TEST_Z(eax, eax)) goto loc_00425D27; /* je: equal / zero */
 
 loc_00425D0C: ;
-    (void)0; /* cmp MEM32(esi), 0 - flags set for next jcc */
-    SET_LO8(ecx, (CMP_EQ(MEM32(esi), 0)) ? 1 : 0); /* sete */
+    (void)0; /* cmp MEM32(pool_slot), 0 - flags set for next jcc */
+    SET_LO8(ecx, (CMP_EQ(MEM32(pool_slot), 0)) ? 1 : 0); /* sete */
     { uint32_t _icall_esp = g_esp;
     PUSH32(esp, 0x647384);
     PUSH32(esp, 0x27BA);
@@ -4348,10 +4349,10 @@ loc_00425D27: ;
     PUSH32(esp, 0); sub_0046DAB2(); /* call 0x0046DAB2 */
 
 loc_00425D31: ;
-    MEM32(esi) = eax;
-    esi = esi + 4;
+    MEM32(pool_slot) = eax;
+    pool_slot = pool_slot + 4;
     esp = esp + 4;
-    if (CMP_L(esi, 0x84C178)) goto loc_00425D03; /* jl: less (signed <) */
+    if (CMP_L(pool_slot, 0x84C178)) goto loc_00425D03; /* jl: less (signed <) */
 
 loc_00425D41: ;
     eax = MEM32(0x84BE58);
@@ -13957,10 +13958,9 @@ loc_0042C2B8: ;
     eax = MEM32(0x28);
 
 loc_0042C2BE: ;
-    eax = MEM32(0x75F014);
-    ecx = MEM32(4);
-    eax = MEM32(ecx + eax * 4);
-    eax = MEM32(eax + 8);
+    /* fs:[4] aliases GPU-visible low RAM in the flattened address model.
+     * Use the runtime's isolated CRT TLS block instead. */
+    eax = MEM32(0x00760208);
     esp += 4; return; /* ret */
 
 }
@@ -13983,11 +13983,8 @@ loc_0042C2E0: ;
     eax = MEM32(0x28);
 
 loc_0042C2E6: ;
-    ecx = MEM32(4);
-    eax = MEM32(0x75F014);
-    eax = MEM32(ecx + eax * 4);
     ecx = MEM32(esp + 4);
-    MEM32(eax + 8) = ecx;
+    MEM32(0x00760208) = ecx;
     esp += 8; return; /* ret 4 */
 
 }
@@ -14665,6 +14662,10 @@ loc_0042C856: ;
 loc_0042C85D: ;
     edx = eax + ecx + -1;
     if (CMP_B(edx, eax)) goto loc_0042C8A3; /* jb: below (unsigned <) */
+    /* The original probe catches an invalid page through SEH. The portable
+     * runtime has no guest SEH dispatcher yet, so reject addresses outside
+     * the 64-MB Xbox RAM window explicitly. */
+    if (eax >= 0x04000000u || edx >= 0x04000000u) goto loc_0042C8A3;
 
 loc_0042C865: ;
     MEM32(ebp + -4) = MEM32(ebp + -4) & 0;
@@ -14733,6 +14734,7 @@ loc_0042C8BB: ;
 loc_0042C8C2: ;
     edx = eax + ecx + -1;
     if (CMP_B(edx, eax)) goto loc_0042C90C; /* jb: below (unsigned <) */
+    if (eax >= 0x04000000u || edx >= 0x04000000u) goto loc_0042C90C;
 
 loc_0042C8CA: ;
     MEM32(ebp + -4) = MEM32(ebp + -4) & 0;

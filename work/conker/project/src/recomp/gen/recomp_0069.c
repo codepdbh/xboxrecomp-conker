@@ -1071,7 +1071,14 @@ loc_0053C2C0: ;
     ecx = MEM32(edx);
     edi = esi;
     edi = edi - ecx;
-    if (CMP_B(eax, edi)) goto loc_0053C2C0; /* jb: below (unsigned <) */
+    if (CMP_B(eax, edi)) {
+        /* The standalone NV2A hook consumes submitted push-buffer work
+         * synchronously, so there is no hardware DMA thread to advance GET.
+         * Publish the completed position instead of spinning forever. */
+        MEM32(edx) = esi;
+        ecx = esi;
+        edi = 0;
+    }
 
 loc_0053C2CA: ;
     POP32(esp, ebx);
@@ -4679,14 +4686,61 @@ loc_0053F91B: ;
  */
 void sub_0053F9B0(void)
 {
-    uint32_t ebp;
-    ebp = g_seh_ebp; /* fpo_leaf: inherit caller's frame */
+    const uint32_t format_object = ecx;
+    uint32_t target;
+    uint32_t format_bits;
+    uint32_t use_format_bits = 0;
 
-loc_0053F9B0: ;
-    edx = ZX8(MEM8(ecx + 0xD));
+    /* The original function jumps into one of ten internal basic blocks.
+     * Those blocks were mistaken for external tail calls by function
+     * detection, so reproduce the compact jump-table logic here. */
+    edx = ZX8(MEM8(format_object + 0xD));
     eax = ZX8(MEM8(edx + 0x53FA89));
-    g_seh_ebp = ebp; RECOMP_ITAIL(MEM32(eax * 4 + 0x53FA60)); return; /* indirect tail jmp */
+    target = MEM32(eax * 4 + 0x53FA60);
 
+    switch (target) {
+    case 0x0053F9C2: eax = 8;  use_format_bits = 1; break;
+    case 0x0053F9E9: eax = 8;  eax |= 0x100; break;
+    case 0x0053FA11: eax = 4;  use_format_bits = 1; break;
+    case 0x0053FA18: eax = 4;  eax |= 0x100; break;
+    case 0x0053FA1F: eax = 3;  use_format_bits = 1; break;
+    case 0x0053FA26: eax = 3;  eax |= 0x100; break;
+    case 0x0053FA2D: eax = 1;  use_format_bits = 1; break;
+    case 0x0053FA34: eax = 1;  eax |= 0x100; break;
+    case 0x0053FA3B: eax = 9;  eax |= 0x100; break;
+    case 0x0053FA42: eax = 10; eax |= 0x100; break;
+    default:
+        eax = 0;
+        esp += 4;
+        return;
+    }
+
+    if (use_format_bits) {
+        ecx = MEM32(format_object + 0xC);
+        format_bits = ((ecx & 0x00F00000) | 0x2000) >> 4;
+        format_bits |= ecx & 0x0F000000;
+        eax |= format_bits;
+    }
+
+    if (esi != 0) {
+        ecx = ZX8(MEM8(esi + 0xD)) - 0x2A;
+        if (ecx <= 7) {
+            ecx = ZX8(MEM8(ecx + 0x53FAB0));
+            target = MEM32(ecx * 4 + 0x53FAA8);
+            if (target == 0x0053FA49)
+                eax |= 0x20;
+            else if (target == 0x0053FA5B)
+                eax |= 0x10;
+        }
+    } else {
+        if ((MEM8(edx + 0x545CD0) & 0x3C) == 0x20)
+            eax |= 0x20;
+        else
+            eax |= 0x10;
+    }
+
+    esp += 4;
+    return;
 }
 
 /**
