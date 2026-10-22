@@ -1,0 +1,20 @@
+{
+  "$schema": "https://recomp.fyi/schema/v1.json",
+  "game": "Conker: Live & Reloaded",
+  "system": "Xbox",
+  "type": "recomp",
+  "project": "Conker Live & Reloaded Static Recompilation",
+  "status": "in-progress",
+  "targets": [
+    "Windows"
+  ],
+  "approach": "Static x86-to-C recompilation using xboxrecomp with Xbox kernel and NV2A compatibility work.",
+  "maintainers": [
+    {
+      "name": "codepdbh",
+      "link": "https://github.com/codepdbh"
+    }
+  ],
+  "notes": "Experimental bring-up produces a native Windows executable and reaches the main game code. GPU synchronization and missing kernel exports remain; visible, controllable gameplay is not yet available.",
+  "toolchain": "Xboxrecomp"
+}
